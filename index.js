@@ -1,4 +1,3 @@
-require('babel-register')({
-    "presets": ["es2015"]
-});
-module.exports = require('./lib/axe');
+var axe = require('./dist/axe');
+global.axe = axe;
+module.exports = axe;
