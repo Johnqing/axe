@@ -22,7 +22,7 @@ axe.init({
     'favicon': 'public/favicon.ico',
     'static': ['public'],
     'body parser': '50mb',
-    'middleware path': 'middleware',
+    'middleware path': ['middleware'],
     'controller path': 'controller'
 });
 axe.start();
