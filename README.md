@@ -13,18 +13,20 @@ axe.init({
     'compression': true,
     'trust proxy': true,
     'view engine': 'jade',
-    'views': 'views',
     'view pretty': true,
     'view cache': false,
     'locals': {
         title: 'axe'
     },
     'favicon': 'public/favicon.ico',
-    'static': ['public'],
-    'body parser': '50mb',
-    'middleware path': ['middleware'],
-    'controller path': 'controller'
+    'body parser': '50mb'
 });
+
+axe.set('static', ['public']);
+axe.set('middleware path', ['middleware']);
+axe.set('controller path', 'controller');
+axe.set('views', 'controller');
+
 axe.start();
 ```
 
