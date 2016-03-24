@@ -12,8 +12,8 @@ import serveStatic from 'serve-static';
 import bodyParser from 'body-parser';
 import log4js from 'log4js';
 
-import log4jsConfig from './log4js.js';
-import * as utils from './utils.js';
+import log4jsConfig from '../config/log/log4js.js';
+import * as utils from '../util/index.js';
 
 const dashes = '\n------------------------------------------------\n';
 /**
@@ -21,7 +21,7 @@ const dashes = '\n------------------------------------------------\n';
  *
  * @api public
  */
-export class Axe {
+class Axe {
     constructor() {
         this.express = express;
         this._options = {
@@ -30,6 +30,7 @@ export class Axe {
         // 工具
         this.utils = utils;
 
+        this.set('debug', true);
         this.set('cookie secret', 'axe secret');
         this.set('session options', '');
         this.set('env', process.env.NODE_ENV || 'development');
@@ -43,7 +44,7 @@ export class Axe {
         this.initExpressSession();
 
         this.logConfigure();
-        const log = this.log('application');
+        const log = this.__logHelper = this.log('APP');
 
         // 显示团队信息
         app.use((req, res, next) => {
@@ -121,8 +122,10 @@ export class Axe {
             const routers = path.join(cpath, '**/*.js');
             glob.sync(routers).forEach((file)=> {
                 const routerDirname = file.replace(cpath, '');
-                const router = routerDirname.replace('.js', '');
-                app.use(router, require(file));
+                const URI = routerDirname.replace('.js', '');
+                // express 4 路由处理
+                let router = this.express.Router();
+                app.use(URI, require(file)(router));
             });
         }
         // error
@@ -226,7 +229,7 @@ export class Axe {
      * @returns {Axe}
      */
     start() {
-        process.on('uncaughtException', function (e) {
+        process.on('uncaughtException',  (e) => {
             if (e.code === 'EADDRINUSE') {
                 console.log(dashes
                     + this.get('name') + ' failed to start: address already in use\n'
@@ -273,10 +276,15 @@ export class Axe {
     logConfigure(){
         const logDirectory = this.get('logs file') || path.join(this.get('root'), 'logs');
         fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
-        const config = log4jsConfig(logDirectory);
+        const config = log4jsConfig(logDirectory, this.get('debug'));
         return log4js.configure(config);
     }
 
+    /**
+     * logger
+     * @param type      日志类型
+     * @returns {*}
+     */
     log(type){
         return log4js.getLogger(type);
     }
@@ -361,3 +369,5 @@ export class Axe {
         value.substring(1, 2) !== ':\\') ? path.join(this.get('root'), value) : value;
     }
 }
+
+module.exports = Axe;

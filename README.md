@@ -21,7 +21,8 @@ axe.init({
     'favicon': 'public/favicon.ico',
     'body parser': '50mb'
 });
-
+// 请在生产关闭debug
+axe.set('debug', true);
 axe.set('static', ['public']);
 axe.set('middleware path', ['middleware']);
 axe.set('controller path', 'controller');
@@ -31,3 +32,13 @@ axe.start();
 ```
 
 *ps: `controller path` 这个比较特殊会根据传入的路径，生成路由。*
+
+## controller or router
+```
+module.exports = function(router){
+    router.get('/', function(req, res) {
+        return res.render('index');
+    });
+    return router;
+};
+```

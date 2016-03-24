@@ -5,8 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "babel lib -d dist",
-    "prepublish": "npm run compile"
+    "compile": "babel --presets es2015-loose,stage-1 --plugins transform-runtime src/ --out-dir lib/ --source-maps",
+    "watch-compile": "npm run compile -- --watch",
+    "watch": "npm run watch-compile",
+    "prepublish": "npm run compile",
+    "eslint": "eslint src/"
   },
   "keywords": [
     "axe"
