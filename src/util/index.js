@@ -17,6 +17,16 @@ let htmlEntitiesRegExp = '';
 })();
 
 /**
+ * 国内手机号校验
+ * @param mobile
+ * @returns {boolean}
+ */
+export function ismobile(mobile){
+    //todo: 这个字段需要跟着运营商变化变化
+    return /^(13|15|18|14|17)\d{9}$/.test(mobile);
+}
+
+/**
  * 将字符串转换为数字
  * @param value
  * @param mode
@@ -169,14 +179,30 @@ export function encodeHTMLEntities (str){
  * @param length
  * @returns {string}
  */
-export function uuid(length = 32) => {
+export function uuid(length = 32){
     // length = length || 32;
     let str = crypto.randomBytes(Math.ceil(length * 0.75)).toString('base64').slice(0, length);
     return str.replace(/[\+\/]/g, '_');
 }
-
-export function mkdir(p, mode) => {
-    mode = mode || '0777';
+/**
+ * 文件权限
+ * @param p
+ * @param mode
+ * @returns {*}
+ */
+export let chmod = (p, mode = '0777') => {
+    if (!fs.existsSync(p)) {
+        return true;
+    }
+    return fs.chmodSync(p, mode);
+};
+/**
+ * 创建目录
+ * @param p
+ * @param mode
+ * @returns {boolean}
+ */
+export let mkdir = (p, mode = '0777') => {
     if (fs.existsSync(p)) {
         chmod(p, mode);
         return true;
@@ -189,4 +215,44 @@ export function mkdir(p, mode) => {
         mkdir(p, mode);
     }
     return true;
-}
+};
+/**
+ * md5
+ * @param str
+ * @returns {*}
+ */
+export let md5 = str => {
+    let instance = crypto.createHash('md5');
+    instance.update(str + '', 'utf8');
+    return instance.digest('hex');
+};
+
+/**
+ * 获取日期
+ * @param  {Date} date []
+ * @return {String}      []
+ */
+let datetime = (date, format) => {
+    let fn = d => {
+        return ('0' + d).slice(-2);
+    };
+
+    if(date && _.isString(date)){
+        date = new Date(Date.parse(date));
+    }
+    let d = date || new Date();
+
+    format = format || 'YYYY-MM-DD HH:mm:ss';
+    let formats = {
+        YYYY: d.getFullYear(),
+        MM:  fn(d.getMonth() + 1),
+        DD: fn(d.getDate()),
+        HH: fn(d.getHours()),
+        mm: fn(d.getMinutes()),
+        ss: fn(d.getSeconds())
+    };
+
+    return format.replace(/([a-z])\1+/ig, a => {
+        return formats[a] || a;
+    });
+};

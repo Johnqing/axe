@@ -1,2 +1,3 @@
 import Axe from './core/axe.js';
-module.exports = new Axe();
+let axe = new Axe();
+module.exports = global.axe = axe;

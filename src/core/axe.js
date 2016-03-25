@@ -12,8 +12,11 @@ import serveStatic from 'serve-static';
 import bodyParser from 'body-parser';
 import log4js from 'log4js';
 
-import log4jsConfig from '../config/log/log4js.js';
-import * as utils from '../util/index.js';
+import log4jsConfig from '../config/log/log4js';
+import * as utils from '../util/index';
+
+import WatchClass from '../util/watch';
+import DBClass from '../model/base';
 
 const dashes = '\n------------------------------------------------\n';
 /**
@@ -30,6 +33,7 @@ class Axe {
         // 工具
         this.utils = utils;
 
+        this.set('compile', false);
         this.set('debug', true);
         this.set('cookie secret', 'axe secret');
         this.set('session options', '');
@@ -37,6 +41,20 @@ class Axe {
         this.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT);
         this.set('host', process.env.HOST || process.env.IP || process.env.OPENSHIFT_NODEJS_IP);
         this.set('listen', process.env.LISTEN);
+    }
+    // 可以使用es2015 开发
+    compile(){
+        let watch = new WatchClass(this.getPath('source Path'), this.getPath('output Path'), this.get('babel options'));
+        this.set('compile', true);
+        watch.compile();
+        return this;
+    }
+    /**
+     * 初始化model
+     * @returns {Axe}
+     */
+    initModel(){
+        return new DBClass(this.get('db config'), this.getPath('model path'));
     }
 
     creatExpressApp() {
@@ -275,7 +293,7 @@ class Axe {
      */
     logConfigure(){
         const logDirectory = this.get('logs file') || path.join(this.get('root'), 'logs');
-        fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
+        utils.mkdir(logDirectory);
         const config = log4jsConfig(logDirectory, this.get('debug'));
         return log4js.configure(config);
     }
