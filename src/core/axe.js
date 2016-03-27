@@ -44,8 +44,9 @@ class Axe {
     }
     // 可以使用es2015 开发
     compile(){
+        if(!this.get('compile'))
+            return this;
         let watch = new WatchClass(this.getPath('source Path'), this.getPath('output Path'), this.get('babel options'));
-        this.set('compile', true);
         watch.compile();
         return this;
     }
@@ -126,24 +127,25 @@ class Axe {
         // 中间件
         const middleWarePath = this.get('middleware path');
         if (typeof middleWarePath === 'string') {
-            app.use(serveStatic(this.getPath('middleware path')));
+            app.use(serveStatic(this.getCompilePath(middleWarePath)));
         } else if (Array.isArray(middleWarePath)) {
             statics.forEach((path)=> {
-                app.use(serveStatic(this.expandPath(path)));
+                app.use(serveStatic(this.expandPath(this.getCompilePath(path))));
             });
         }
 
         // controller
         const controllerPath = this.get('controller path');
         if(controllerPath){
-            const cpath = this.expandPath(controllerPath);
+            const cpath = this.getCompilePath(controllerPath);
             const routers = path.join(cpath, '**/*.js');
             glob.sync(routers).forEach((file)=> {
                 const routerDirname = file.replace(cpath, '');
                 const URI = routerDirname.replace('.js', '');
                 // express 4 路由处理
                 let router = this.express.Router();
-                app.use(URI, require(file)(router));
+                let routerFn = require(file).default || require(file);
+                app.use(URI, routerFn(router));
             });
         }
         // error
@@ -365,6 +367,20 @@ class Axe {
      */
     get(key) {
         return this._options[key];
+    }
+
+    /**
+     * 获取编译后的路径
+     * @param filePath
+     * @returns {*}
+     */
+    getCompilePath(filePath){
+        if(this.get('compile')){
+            let relPath = filePath.replace(this.get('source Path'), '');
+            let newPath = path.join(this.getPath('output Path'), relPath);
+            return this.expandPath(newPath);
+        }
+        return this.expandPath(filePath);
     }
 
     /**
