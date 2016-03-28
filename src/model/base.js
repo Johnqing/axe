@@ -12,14 +12,14 @@ let dbCache = {};
  * @returns {{}}
  */
 export default function(config, modelPath){
-    let log = axe.log('[SQL]');
+    let loger = axe.log('[SQL]');
     // sql config
     let sqlConf = _.assign({
         host: config.host,
         port: config.port || 3306,
         dialect: config.dialect || 'mysql',
         logging: (log) => {
-            log.info(log);
+            loger.info(log);
         },
         // 不需要创建createdAt|updatedAt2个字段
         define: {
@@ -38,7 +38,7 @@ export default function(config, modelPath){
      * 获取所有model
      */
     glob.sync(path.join(modelPath, '**/*.js')).forEach((file) => {
-        let model = seq.import(path.join(modelPath, file));
+        let model = seq.import(file);
         dbCache[model.name] = model;
     });
     /**
@@ -49,6 +49,8 @@ export default function(config, modelPath){
             dbCache[modelName].associate(dbCache);
         }
     });
+
+    loger.debug(JSON.stringify(dbCache));
 
     dbCache.sequelize = seq;
     dbCache.Sequelize = Sequelize;

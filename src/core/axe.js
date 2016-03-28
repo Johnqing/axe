@@ -55,7 +55,9 @@ class Axe {
      * @returns {Axe}
      */
     initModel(){
-        return new DBClass(this.get('db config'), this.getPath('model path'));
+        let modelPath = this.getCompilePath(this.get('model path'));
+        this.models = new DBClass(this.get('db config'), modelPath);
+        return this;
     }
 
     creatExpressApp() {
