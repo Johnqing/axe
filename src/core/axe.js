@@ -17,6 +17,7 @@ import * as utils from '../util/index';
 
 import WatchClass from '../util/watch';
 import DBClass from '../model/base';
+import log4jsConnect from '../util/log4js-connect';
 
 const dashes = '\n------------------------------------------------\n';
 /**
@@ -117,7 +118,7 @@ class Axe {
         }
         // http log
         if(this.get('logs http')){
-            app.use(log4js.connectLogger(this.log("http"), { level: 'auto' }));
+            app.use(log4jsConnect(this.log("http"), this.get('logs http')));
         }
         // body parse
         const limit = this.get('body parser') || '50mb';
