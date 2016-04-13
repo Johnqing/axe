@@ -9,8 +9,8 @@ npm install axejs
 ## use
 ```
 var path = require('path');
-var axe = require('axe');
-axe.init({
+var axejs = require('axejs');
+axejs.init({
     'root': path.join(__dirname, '../'),
     'name': 'axe test',
     'host': '127.0.0.1',
@@ -31,17 +31,17 @@ axe.init({
     'middleware path': ['src/server/middleware']
 });
 
-axe.set('debug', true);
-axe.set('views', 'src/public/views');
-axe.set('controller path', 'src/server/controller');
+axejs.set('debug', true);
+axejs.set('views', 'src/public/views');
+axejs.set('controller path', 'src/server/controller');
 
-axe.set('babel options', {log: true});
-axe.set('compile', true);
-axe.set('source Path', 'src/server');
-axe.set('output Path', 'output');
-axe.compile();
+axejs.set('babel options', {log: true});
+axejs.set('compile', true);
+axejs.set('source Path', 'src/server');
+axejs.set('output Path', 'output');
+axejs.compile();
 
-axe.start();
+axejs.start();
 ```
 
 ### controller or router
