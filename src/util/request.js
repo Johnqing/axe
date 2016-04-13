@@ -1,7 +1,8 @@
 import request from 'request';
 import * as util from './index';
+import log4js from 'log4js';
 
-const logger = axe.log('[API]');
+const logger = log4js.getLogger('[API]');
 
 
 export default function(){
