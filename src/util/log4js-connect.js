@@ -1,4 +1,4 @@
-import * as utils from './index';
+import * as util from './index';
 const DEFAULT_FORMAT = `[:remote-addr] -- :url|:req[cookies]|:referrer##:user-agent##`;
 /**
  * 返回日志信息
@@ -16,7 +16,7 @@ function format(str, req, res){
         .replace(':date', new Date().toUTCString())
         .replace(':referrer', req.headers.referer || req.headers.referrer || '')
         .replace(':http-version', req.httpVersionMajor + '.' + req.httpVersionMinor)
-        .replace(':remote-addr', utils.realIp(req) || utils.clientIp(req))
+        .replace(':remote-addr', util.realIp(req) || util.clientIp(req))
         .replace(':user-agent', req.headers['user-agent'] || '')
         .replace(
         ':content-length',
@@ -57,9 +57,11 @@ export default function(logger, formatString, nolog){
 
         let now = new Date();
         let statusCode;
-        let logFn = logger.info;
+        let type = 'info';
         let writeHead = res.writeHead;
         let end = res.end;
+        // 设置一个请求时间
+        req.__datestamp = new Date().getTime();
 
         res.writeHead = (code, reasonPhrase, headers) => {
             if (typeof reasonPhrase === 'object' && reasonPhrase !== null) {
@@ -73,16 +75,20 @@ export default function(logger, formatString, nolog){
 
             // 根据状态不一样，值也不一样
             if(code >= 300)
-                logFn = logger.warn;
+                type = 'warn';
             if(code >= 400)
-                logFn = logger.error;
+                type = 'error';
         };
 
         res.end = (chunk, encoding) => {
             res.end = end;
             res.end(chunk, encoding);
             res.responseTime = new Date() - now;
-            logFn.call(logger, format(fmt, req, res));
+            // 记录日志
+            util.recordLog(logger, {
+                type: type,
+                content: format(fmt, req, res)
+            });
         };
 
         next();

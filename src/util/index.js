@@ -232,7 +232,7 @@ export let md5 = str => {
  * @param  {Date} date []
  * @return {String}      []
  */
-let datetime = (date, format) => {
+export let datetime = (date, format) => {
     let fn = d => {
         return ('0' + d).slice(-2);
     };
@@ -256,3 +256,41 @@ let datetime = (date, format) => {
         return formats[a] || a;
     });
 };
+/**
+ * 获取请求的唯一uid
+ * @param req
+ * @returns {*}
+ */
+export function createRequestUid(req){
+    let rid = req.__datestamp || new Date().getTime();
+    let ip = realIp(req) || clientIp(req);
+    let referer = req.headers.referer || req.headers.referrer || '';
+    let cookies = req['cookies'] || '';
+    let statusCode = res.__statusCode || res.statusCode;
+    return md5(rid + ip + req.url + referer + cookies + req.method + statusCode).substring(19);
+}
+/**
+ * 记录日志
+ * @param logger
+ * @param options
+ */
+export function recordLog(logger, options){
+    let key = createRequestUid(options.req);
+    let ip = realIp(options.req) || clientIp(options.req);
+    let content = typeof options.content === 'string' ? options.content : JSON.stringify(options.content);
+    let other = options.other || '';
+    // log info
+    let logFn = logger.info;
+    // error
+    if(options.type === 'error'){
+        logFn = logger.error;
+    }
+    // warn
+    if(options.type === 'warn'){
+        logFn = logger.warn;
+    }
+
+    let log = `[${key}] [${ip}] ${options.name}|${options.category}|${options.req.originalUrl || ''}|${content}${other}`;
+
+    logFn.call(logger, log);
+}

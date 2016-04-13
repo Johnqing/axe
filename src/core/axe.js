@@ -16,8 +16,10 @@ import log4jsConfig from '../config/log/log4js';
 import * as utils from '../util/index';
 
 import WatchClass from '../util/watch';
-import DBClass from '../model/base';
 import log4jsConnect from '../util/log4js-connect';
+import request from '../util/request';
+
+import DBClass from '../model/base';
 
 const dashes = '\n------------------------------------------------\n';
 /**
@@ -33,6 +35,7 @@ class Axe {
         };
         // 工具
         this.utils = utils;
+        this.request = request;
 
         this.set('compile', false);
         this.set('debug', true);
@@ -118,7 +121,7 @@ class Axe {
         }
         // http log
         if(this.get('logs http')){
-            app.use(log4jsConnect(this.log("http"), this.get('logs http')));
+            app.use(log4jsConnect(this.log('[ACCESS]'), this.get('logs http')));
         }
         // body parse
         const limit = this.get('body parser') || '50mb';
