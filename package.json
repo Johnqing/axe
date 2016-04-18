@@ -38,6 +38,7 @@
     "es6-promise": "^3.0.2",
     "express": "^4.13.3",
     "express-jwt": "^3.3.0",
+    "express-mysql-session": "^0.4.4",
     "express-session": "^1.11.3",
     "glob": "^5.0.15",
     "jade": "^1.11.0",

@@ -216,12 +216,19 @@ class Axe {
             if (sessionStore === 'redis') {
                 sessionStore = 'connect-redis';
             }
+            if (sessionStore === 'mysql') {
+                sessionStore = 'express-mysql-session';
+            }
+            let SessionStore;
             // 处理不同的session store，目前只支持redis
             switch (sessionStore) {
                 case 'connect-redis':
+                    SessionStore = require(sessionStore)(session);
+                    break;
+                case 'express-mysql-session':
+                    SessionStore = require(sessionStore);
                     break;
             }
-            const SessionStore = require(sessionStore)(session);
             sessionOptions.store = new SessionStore(sessionStoreOptions);
         }
 
