@@ -91,14 +91,29 @@ class Axe {
 
         // view engine
         const engine = this.get('view engine');
-        app.set('views', this.getPath('views') || path.sep);
-        app.set('view engine', engine);
 
-        // jade的情况下，建议在开发环境开启非压缩模式，进行调试
-        if (engine === 'jade' && this.get('view pretty')) {
-            app.locals.pretty = true;
+        switch (engine){
+            case 'hbs':
+                let exphbs  = require('express-handlebars');
+                app.engine('hbs', exphbs({
+                    // 设置布局模版文件的目录为 views 文件夹
+                    layoutsDir: this.getPath('views') || path.sep,
+                    // 设置默认的页面布局模版为 layout.hbs 文件
+                    defaultLayout: this.getPath('views layout') || 'layout',
+                    // 模版文件使用的后缀名
+                    extname: this.getPath('views extname') || '.hbs'
+                }));
+                break;
+            default:
+                app.set('views', this.getPath('views') || path.sep);
+
+                // jade的情况下，建议在开发环境开启非压缩模式，进行调试
+                if (this.get('view pretty')) {
+                    app.locals.pretty = true;
+                }
         }
 
+        app.set('view engine', engine);
         // cache
         app.set('view cache', this.get('view cache'));
 

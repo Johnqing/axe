@@ -1,7 +1,7 @@
 {
   "name": "axejs",
-  "version": "0.1.2",
-  "description": "框架",
+  "version": "1.0.0",
+  "description": "es6 express framework",
   "bin": {
     "axe": "./bin/index.js"
   },
@@ -37,6 +37,7 @@
     "csurf": "^1.8.3",
     "es6-promise": "^3.0.2",
     "express": "^4.13.3",
+    "express-handlebars": "^3.0.0",
     "express-jwt": "^3.3.0",
     "express-mysql-session": "^0.4.4",
     "express-session": "^1.11.3",
