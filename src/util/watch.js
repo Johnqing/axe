@@ -5,7 +5,7 @@ import glob from 'glob';
 
 export default class {
     constructor(...args){
-        this.loger = axe.log('CompileBabel');
+        this.loger = axejs.log('CompileBabel');
         this.init(...args);
     }
 

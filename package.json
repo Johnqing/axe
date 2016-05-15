@@ -1,6 +1,6 @@
 {
   "name": "axejs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "es6 express framework",
   "bin": {
     "axe": "./bin/index.js"
