@@ -28,7 +28,7 @@ axejs.init({
     'favicon': 'src/public/static/favicon.ico',
     'static': ['public'],
     'body parser': '50mb',
-    'middleware path': ['src/server/middleware']
+    'middleware path': ['src/server/middleware/common/**/*.js']
 });
 
 axejs.set('debug', true);

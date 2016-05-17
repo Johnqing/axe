@@ -73,7 +73,7 @@ class Axe {
 
         // 显示团队信息
         app.use((req, res, next) => {
-            res.header('X-Powered-By', 'Axe <TJFE>');
+            res.header('X-Powered-By', 'Axe <FEEl>');
             next();
         });
 
@@ -94,26 +94,24 @@ class Axe {
 
         switch (engine){
             case 'hbs':
-                let exphbs  = require('express-handlebars');
-                app.engine('hbs', exphbs({
-                    // 设置布局模版文件的目录为 views 文件夹
-                    layoutsDir: this.getPath('views') || path.sep,
-                    // 设置默认的页面布局模版为 layout.hbs 文件
-                    defaultLayout: this.getPath('views layout') || 'layout',
-                    // 模版文件使用的后缀名
-                    extname: this.getPath('views extname') || '.hbs'
-                }));
+                let hbs  = require('hbs');
+                if(this.get('views extname') === '.html'){
+                    app.set('view engine', 'html');
+                    app.engine('html', hbs.__express);
+                } else {
+                    app.set('view engine', engine);
+                }
                 break;
             default:
-                app.set('views', this.getPath('views') || path.sep);
+                app.set('view engine', engine);
 
                 // jade的情况下，建议在开发环境开启非压缩模式，进行调试
                 if (this.get('view pretty')) {
                     app.locals.pretty = true;
                 }
         }
+        app.set('views', this.getPath('views') || path.sep);
 
-        app.set('view engine', engine);
         // cache
         app.set('view cache', this.get('view cache'));
 
@@ -148,10 +146,14 @@ class Axe {
         // 中间件
         const middleWarePath = this.get('middleware path');
         if (typeof middleWarePath === 'string') {
-            app.use(serveStatic(this.getCompilePath(middleWarePath)));
+            glob.sync(this.getCompilePath(middleWarePath)).forEach((file)=> {
+                app.use(require(file));
+            });
         } else if (Array.isArray(middleWarePath)) {
-            statics.forEach((path)=> {
-                app.use(serveStatic(this.expandPath(this.getCompilePath(path))));
+            middleWarePath.forEach((path)=> {
+                glob.sync(this.expandPath(this.getCompilePath(path))).forEach((file)=> {
+                    app.use(require(file));
+                });
             });
         }
 
@@ -162,7 +164,7 @@ class Axe {
             const routers = path.join(cpath, '**/*.js');
             glob.sync(routers).forEach((file)=> {
                 const routerDirname = file.replace(cpath, '');
-                const URI = routerDirname.replace('.js', '');
+                const URI = routerDirname.replace(/\.js/, '');
                 // express 4 路由处理
                 let router = this.express.Router();
                 let routerFn = require(file).default || require(file);
