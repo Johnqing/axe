@@ -45,12 +45,11 @@ export default function(config, modelPath){
      * 多表关联
      */
     Object.keys(dbCache).forEach(function (modelName) {
+        loger.debug('modelName', modelName);
         if ("associate" in dbCache[modelName]) {
             dbCache[modelName].associate(dbCache);
         }
     });
-
-    loger.debug(JSON.stringify(dbCache));
 
     dbCache.sequelize = seq;
     dbCache.Sequelize = Sequelize;
