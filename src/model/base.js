@@ -12,7 +12,7 @@ let dbCache = {};
  * @returns {{}}
  */
 export default function(config, modelPath){
-    let loger = axe.log('[SQL]');
+    let loger = axejs.log('[SQL]');
     // sql config
     let sqlConf = _.assign({
         host: config.host,
